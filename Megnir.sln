@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Megnir", "Megnir\Megnir.csproj", "{DEF06D62-8804-4755-8877-0ED162B36BCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Megnir.Core", "Megnir.Core\Megnir.Core.csproj", "{2DE66867-0A66-43E4-A05E-D8D4BC0B6797}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEF06D62-8804-4755-8877-0ED162B36BCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF06D62-8804-4755-8877-0ED162B36BCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF06D62-8804-4755-8877-0ED162B36BCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF06D62-8804-4755-8877-0ED162B36BCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DE66867-0A66-43E4-A05E-D8D4BC0B6797}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DE66867-0A66-43E4-A05E-D8D4BC0B6797}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DE66867-0A66-43E4-A05E-D8D4BC0B6797}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DE66867-0A66-43E4-A05E-D8D4BC0B6797}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D3E023C-9360-468F-B54A-DFF5B9325B92}
+	EndGlobalSection
+EndGlobal
