@@ -14,10 +14,9 @@ Very specific file backup service in C#.
 * Run on or synchronize multiple machines.
 * Send files to other targets.
 
-## Possible future improvements
+## Known issues
 
-* Alternative file codification to save storage costs (ZeroMQ, Avro, Parquet, ...)
-* Ability to restore the latest backup to the local machine.
+* Backing up Windows directories produces ZIP files that cannot be opened with Windows File Explorer, as the drive letter ("C:") is made into a directory inside the ZIP.
 
 ## Instructions
 
