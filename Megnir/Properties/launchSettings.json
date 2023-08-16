@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Megnir": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

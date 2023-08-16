@@ -1,49 +1,76 @@
-﻿using Megnir.Core.Services;
-using Megnir.Model;
+﻿using Megnir.Model;
+using Megnir.Services;
+using Snow;
+using Snow.Attributes;
 
-Console.WriteLine("Project Megnir is starting...");
+namespace Megnir;
 
-var configService = new ConfigurationService<MegnirSettings>();
-var config = configService.FromJsonFile("appsettings.json");
-var zipService = new ZipService();
-var azureService = new AzureService(config.AzureSettings.ConnectionString);
-
-if (config is null)
+public static class Program
 {
-    Console.WriteLine("Error parsing configuration. Execution will stop.");
-    return;
+    public static void Main(string[] args)
+    {
+        SnowRunner.Run(new Runner(), args);
+    }
 }
 
-Console.WriteLine("Initialization complete.");
-Console.WriteLine($"Found {config.Jobs.Count()} jobs to backup.");
-
-// Generate one zip file per job
-List<(string path, string host, string job)> filesToUpload = new();
-foreach (var job in config.Jobs)
+public class Runner : ISnowRunnable
 {
-    Console.WriteLine($"  Starting backup job {job.Name}...");
+    // Initialize services
+#pragma warning disable CS8618, CS0649
+    [Autowired]
+    private ConfigurationService Config;
 
-    filesToUpload.Add((zipService.SetOutputFile($"{DateTime.Now:yyyy-MM-dd_HHmmss}_{config.HostName}_{job.Name}.zip")
-        .AddFiles(job.ElementsToBackup.Files)
-        .AddDirectories(job.ElementsToBackup.Directories)
-        .Compress(), config.HostName, job.Name));
+    [Autowired]
+    private LogService Log;
 
-    Console.WriteLine($"  Created ZIP file for job {job.Name}.");
+    [Autowired]
+    private ZipService Zip;
+
+    [Autowired]
+    private AzureService Azure;
+#pragma warning restore CS8618, CS0649
+
+    public void Run(string[]? args)
+    {
+        Log.Info("Program:Run", $"Megnir backup service is starting now");
+
+        // Load Megnir configuration
+        var configObj = Config.FromJsonFile<MegnirSettings>("appsettings.json");
+        if (configObj.TryPickT1(out var failure, out var _))
+            Log.FailureMode(failure, true);
+
+        var config = configObj.AsT0;
+
+        Log.Trace("Program:Run", "Initialization complete");
+        Log.Info("Program:Run", $"Found {config.Jobs.Count()} backup jobs for {config.HostName}");
+
+        // Create ZIP files for all the backup jobs
+        var files = new List<(string file, string job)>();
+        foreach (var job in config.Jobs)
+        {
+            var result = Zip.RunBackupJob(config.HostName, job);
+            if (result.TryPickT1(out failure, out var _))
+                Log.FailureMode(failure, false);
+
+            files.Add((result.AsT0, job.Name));
+        }
+
+        // Upload ZIP files to Azure
+        foreach (var file in files)
+        {
+            var result = Azure.Upload(file.file, config.HostName, file.job);
+            if (result.TryPickT1(out failure, out var _))
+                Log.FailureMode(failure, false);
+        }
+
+        Log.Info("Program:Run", "All files uploaded to Azure. Cleaning local cache...");
+
+        // Delete local copies of the backup files
+        foreach (var file in files)
+        {
+            File.Delete(file.file);
+        }
+
+        Log.Info("Program:Run", "Local file cache cleaned. Megnir execution is complete");
+    }
 }
-
-// Upload all the files
-foreach (var (path, host, job) in filesToUpload)
-{
-    Console.WriteLine($"  Uploading file {path}...");
-    azureService.Upload(path, host, job);
-}
-
-Console.WriteLine("All files uploaded. Deleting local cache...");
-
-// Delete local files
-foreach (var (path, _1, _2) in filesToUpload)
-{
-    File.Delete(path);
-}
-
-Console.WriteLine("Backup complete. Bye!");

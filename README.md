@@ -6,7 +6,7 @@ Very specific file backup service in C#.
 * Run as a Docker container.
 * Put a series of files and directories in zip files.
 * Upload those zip files to an Azure Datalake.
-* Set a cron job inside the Docker to run every week.
+* Be launched periodically via cron in the host machine.
 
 ## What is out of scope for this program?
 
@@ -16,7 +16,7 @@ Very specific file backup service in C#.
 
 ## Known issues
 
-* Backing up Windows directories produces ZIP files that cannot be opened with Windows File Explorer, as the drive letter ("C:") is made into a directory inside the ZIP.
+* The cron has to be manually set in the host machine to run Megnir in a time interval. The Docker only does a backup interation when it's executed.
 
 ## Instructions
 
@@ -49,3 +49,16 @@ TODO Create Docker and maybe volume for appsettings?
 ```
 
 TODO Explain settings format.
+
+TODO Script file and cron job:
+
+```sh
+#!/bin/bash
+
+# Run the Megnir backup service
+docker run -d -v /home/user/utils/megnir.json:/app/appsettings.json -v /home/user/volumes/grafana:/data/volumes/grafana megnir:1.2.3-amd64
+```
+
+```cron
+0 2 * * 0 /home/user/utils/megnir.sh
+```
